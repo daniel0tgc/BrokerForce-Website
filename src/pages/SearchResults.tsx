@@ -51,20 +51,12 @@ export default function SearchResults() {
   // Filter and sort properties
   useEffect(() => {
     let filtered = [...sampleProperties];
-<<<<<<< HEAD
-
-=======
     
->>>>>>> 66ff85f98f7fbec0367ae82f0d4719ec136469e5
     // Apply type filter
     if (filterType !== 'all') {
       filtered = filtered.filter(property => property.type === filterType);
     }
-<<<<<<< HEAD
-
-=======
     
->>>>>>> 66ff85f98f7fbec0367ae82f0d4719ec136469e5
     // Apply search filter
     if (query) {
       filtered = filtered.filter(property =>
@@ -74,11 +66,7 @@ export default function SearchResults() {
         property.zipCode.includes(query)
       );
     }
-<<<<<<< HEAD
-
-=======
     
->>>>>>> 66ff85f98f7fbec0367ae82f0d4719ec136469e5
     // Apply sorting
     switch (sortBy) {
       case 'price-low':
@@ -96,11 +84,7 @@ export default function SearchResults() {
       default:
         break;
     }
-<<<<<<< HEAD
-
-=======
     
->>>>>>> 66ff85f98f7fbec0367ae82f0d4719ec136469e5
     setProperties(filtered);
     setCurrentSwipeIndex(0);
   }, [query, sortBy, filterType]);
@@ -158,17 +142,10 @@ export default function SearchResults() {
               </Button>
               <div className="flex items-center">
                 <Home className="h-6 w-6 text-blue-600 mr-2" />
-<<<<<<< HEAD
                 <span className="text-xl font-bold text-gray-900">BrokerForce</span>
               </div>
             </div>
-
-=======
-                <span className="text-xl font-bold text-gray-900">PropertyFinder</span>
-              </div>
-            </div>
             
->>>>>>> 66ff85f98f7fbec0367ae82f0d4719ec136469e5
             {!isMobile && (
               <div className="flex items-center space-x-4">
                 <Button
@@ -196,11 +173,7 @@ export default function SearchResults() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Search Bar */}
         <div className="mb-6">
-<<<<<<< HEAD
-          <SearchBar
-=======
           <SearchBar 
->>>>>>> 66ff85f98f7fbec0367ae82f0d4719ec136469e5
             onSearch={handleSearch}
             placeholder="Search by address, city, or ZIP code"
           />
@@ -272,19 +245,6 @@ export default function SearchResults() {
                     onSwipeLeft={handleSwipeLeft}
                     onSwipeRight={handleSwipeRight}
                   />
-<<<<<<< HEAD
-
-                  <div className="mt-4 text-center text-sm text-gray-600">
-                    {currentSwipeIndex + 1} of {properties.length}
-                  </div>
-
-                  {/* Progress bar */}
-                  <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                      style={{
-                        width: `${((currentSwipeIndex + 1) / properties.length) * 100}%`
-=======
                   
                   <div className="mt-4 text-center text-sm text-gray-600">
                     {currentSwipeIndex + 1} of {properties.length}
@@ -296,7 +256,6 @@ export default function SearchResults() {
                       className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                       style={{ 
                         width: `${((currentSwipeIndex + 1) / properties.length) * 100}%` 
->>>>>>> 66ff85f98f7fbec0367ae82f0d4719ec136469e5
                       }}
                     />
                   </div>
@@ -336,8 +295,4 @@ export default function SearchResults() {
       </div>
     </div>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 66ff85f98f7fbec0367ae82f0d4719ec136469e5
