@@ -17,6 +17,7 @@ export default function SearchResults() {
   const [currentSwipeIndex, setCurrentSwipeIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [viewMode, setViewMode] = useState<'list' | 'swipe'>('list');
+  const [userSelectedView, setUserSelectedView] = useState<'list' | 'swipe' | null>(null);
   const [sortBy, setSortBy] = useState('price-low');
   const [filterType, setFilterType] = useState('all');
 
@@ -24,21 +25,28 @@ export default function SearchResults() {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      const newIsMobile = window.innerWidth < 768;
+      setIsMobile(newIsMobile);
+      
+      // Only auto-switch if user hasn't manually selected a view mode
+      if (userSelectedView === null) {
+        if (newIsMobile && viewMode === 'list') {
+          setViewMode('swipe');
+        } else if (!newIsMobile && viewMode === 'swipe') {
+          setViewMode('list');
+        }
+      }
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [isMobile, viewMode, userSelectedView]);
 
-  useEffect(() => {
-    // Auto-switch to swipe mode on mobile
-    if (isMobile && viewMode === 'list') {
-      setViewMode('swipe');
-    } else if (!isMobile && viewMode === 'swipe') {
-      setViewMode('list');
-    }
-  }, [isMobile, viewMode]);
+  // Handle view mode selection
+  const handleViewModeChange = (mode: 'list' | 'swipe') => {
+    setViewMode(mode);
+    setUserSelectedView(mode);
+  };
 
   // Filter and sort properties
   useEffect(() => {
@@ -142,7 +150,7 @@ export default function SearchResults() {
               <div className="flex items-center space-x-4">
                 <Button
                   variant={viewMode === 'list' ? 'default' : 'outline'}
-                  onClick={() => setViewMode('list')}
+                  onClick={() => handleViewModeChange('list')}
                   size="sm"
                 >
                   <Grid size={16} className="mr-2" />
@@ -150,7 +158,7 @@ export default function SearchResults() {
                 </Button>
                 <Button
                   variant={viewMode === 'swipe' ? 'default' : 'outline'}
-                  onClick={() => setViewMode('swipe')}
+                  onClick={() => handleViewModeChange('swipe')}
                   size="sm"
                 >
                   <Layers size={16} className="mr-2" />
