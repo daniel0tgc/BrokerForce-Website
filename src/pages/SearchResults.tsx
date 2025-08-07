@@ -6,14 +6,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import PropertyCard from '@/components/PropertyCard';
 import SwipeCard from '@/components/SwipeCard';
 import SearchBar from '@/components/SearchBar';
-import { sampleProperties, Property } from '@/data/properties';
-import { Home, Filter, Grid, Layers, ArrowLeft } from 'lucide-react';
+import { useProperties, usePropertySearch } from '@/hooks/useProperties';
+import { PropertySearchParams } from '@/types/simplyrets';
+import { PropertyService } from '@/services/propertyService';
+import { Home, Filter, Grid, Layers, ArrowLeft, Loader2 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
 export default function SearchResults() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [properties, setProperties] = useState<Property[]>(sampleProperties);
   const [currentSwipeIndex, setCurrentSwipeIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [viewMode, setViewMode] = useState<'list' | 'swipe'>('list');
@@ -23,11 +24,40 @@ export default function SearchResults() {
 
   const query = searchParams.get('q') || '';
 
+  // Build search parameters for API
+  const searchParamsForAPI: PropertySearchParams = {
+    propertyType: filterType !== 'all' ? filterType : undefined,
+    limit: 50, // Limit results for better performance
+  };
+
+  // Use React Query hooks for data fetching
+  const {
+    data: properties = [],
+    isLoading,
+    error
+  } = query ? usePropertySearch(query) : useProperties(searchParamsForAPI);
+
+  // Sort properties based on user selection
+  const sortedProperties = [...properties].sort((a, b) => {
+    switch (sortBy) {
+      case 'price-low':
+        return a.price - b.price;
+      case 'price-high':
+        return b.price - a.price;
+      case 'beds':
+        return b.beds - a.beds;
+      case 'sqft':
+        return b.sqft - a.sqft;
+      default:
+        return 0;
+    }
+  });
+
   useEffect(() => {
     const handleResize = () => {
       const newIsMobile = window.innerWidth < 768;
       setIsMobile(newIsMobile);
-      
+
       // Only auto-switch if user hasn't manually selected a view mode
       if (userSelectedView === null) {
         if (newIsMobile && viewMode === 'list') {
@@ -42,52 +72,22 @@ export default function SearchResults() {
     return () => window.removeEventListener('resize', handleResize);
   }, [isMobile, viewMode, userSelectedView]);
 
+  // Reset swipe index when properties change
+  useEffect(() => {
+    setCurrentSwipeIndex(0);
+  }, [properties]);
+
+  // Test SimplyRETS API on component mount
+  useEffect(() => {
+    // Test SimplyRETS API connectivity
+    PropertyService.testSimplyRETS();
+  }, []);
+
   // Handle view mode selection
   const handleViewModeChange = (mode: 'list' | 'swipe') => {
     setViewMode(mode);
     setUserSelectedView(mode);
   };
-
-  // Filter and sort properties
-  useEffect(() => {
-    let filtered = [...sampleProperties];
-    
-    // Apply type filter
-    if (filterType !== 'all') {
-      filtered = filtered.filter(property => property.type === filterType);
-    }
-    
-    // Apply search filter
-    if (query) {
-      filtered = filtered.filter(property =>
-        property.address.toLowerCase().includes(query.toLowerCase()) ||
-        property.city.toLowerCase().includes(query.toLowerCase()) ||
-        property.state.toLowerCase().includes(query.toLowerCase()) ||
-        property.zipCode.includes(query)
-      );
-    }
-    
-    // Apply sorting
-    switch (sortBy) {
-      case 'price-low':
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-high':
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case 'beds':
-        filtered.sort((a, b) => b.beds - a.beds);
-        break;
-      case 'sqft':
-        filtered.sort((a, b) => b.sqft - a.sqft);
-        break;
-      default:
-        break;
-    }
-    
-    setProperties(filtered);
-    setCurrentSwipeIndex(0);
-  }, [query, sortBy, filterType]);
 
   const handleSearch = (newQuery: string) => {
     setSearchParams({ q: newQuery });
@@ -98,7 +98,7 @@ export default function SearchResults() {
       title: "Property passed",
       description: "Property removed from your list",
     });
-    if (currentSwipeIndex < properties.length - 1) {
+    if (currentSwipeIndex < sortedProperties.length - 1) {
       setCurrentSwipeIndex(currentSwipeIndex + 1);
     } else {
       toast({
@@ -113,7 +113,7 @@ export default function SearchResults() {
       title: "Property liked!",
       description: "Property saved to your favorites",
     });
-    if (currentSwipeIndex < properties.length - 1) {
+    if (currentSwipeIndex < sortedProperties.length - 1) {
       setCurrentSwipeIndex(currentSwipeIndex + 1);
     } else {
       toast({
@@ -123,7 +123,41 @@ export default function SearchResults() {
     }
   };
 
-  const currentProperty = properties[currentSwipeIndex];
+  const currentProperty = sortedProperties[currentSwipeIndex];
+
+  // Handle loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-gray-600">Loading properties...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-500 mb-4">
+            <Home size={64} className="mx-auto" />
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            Error loading properties
+          </h3>
+          <p className="text-gray-600 mb-4">
+            {error instanceof Error ? error.message : 'An unexpected error occurred'}
+          </p>
+          <Button onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -145,7 +179,7 @@ export default function SearchResults() {
                 <span className="text-xl font-bold text-gray-900">BrokerForce</span>
               </div>
             </div>
-            
+
             {!isMobile && (
               <div className="flex items-center space-x-4">
                 <Button
@@ -173,7 +207,7 @@ export default function SearchResults() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Search Bar */}
         <div className="mb-6">
-          <SearchBar 
+          <SearchBar
             onSearch={handleSearch}
             placeholder="Search by address, city, or ZIP code"
           />
@@ -183,7 +217,7 @@ export default function SearchResults() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {properties.length} homes {query && `in "${query}"`}
+              {sortedProperties.length} homes {query && `in "${query}"`}
             </h1>
             <p className="text-gray-600">
               {viewMode === 'swipe' && isMobile ? 'Swipe to browse properties' : 'Browse available properties'}
@@ -222,7 +256,7 @@ export default function SearchResults() {
         </div>
 
         {/* Results Display */}
-        {properties.length === 0 ? (
+        {sortedProperties.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-400 mb-4">
               <Home size={64} className="mx-auto" />
@@ -245,17 +279,17 @@ export default function SearchResults() {
                     onSwipeLeft={handleSwipeLeft}
                     onSwipeRight={handleSwipeRight}
                   />
-                  
+
                   <div className="mt-4 text-center text-sm text-gray-600">
-                    {currentSwipeIndex + 1} of {properties.length}
+                    {currentSwipeIndex + 1} of {sortedProperties.length}
                   </div>
-                  
+
                   {/* Progress bar */}
                   <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                      style={{ 
-                        width: `${((currentSwipeIndex + 1) / properties.length) * 100}%` 
+                      style={{
+                        width: `${((currentSwipeIndex + 1) / sortedProperties.length) * 100}%`
                       }}
                     />
                   </div>
@@ -278,7 +312,7 @@ export default function SearchResults() {
         ) : (
           /* List Mode */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {properties.map((property) => (
+            {sortedProperties.map((property) => (
               <PropertyCard
                 key={property.id}
                 property={property}

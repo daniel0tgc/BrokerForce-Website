@@ -26,7 +26,7 @@ export default function SearchBar({ onSearch, className = '', placeholder = "Ent
           placeholder={placeholder}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 h-12 text-lg"
+          className="pl-10 h-12 text-lg text-gray-900"
         />
       </div>
       <Button type="submit" size="lg" className="h-12 px-8 bg-blue-600 hover:bg-blue-700">
