@@ -2,6 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Property } from '@/data/properties';
 import { Bed, Bath, Square } from 'lucide-react';
+import LikeButton from '@/components/LikeButton';
 
 interface PropertyCardProps {
   property: Property;
@@ -32,6 +33,10 @@ export default function PropertyCard({ property, onClick }: PropertyCardProps) {
         <Badge className="absolute top-2 left-2 bg-white text-black hover:bg-white">
           {property.type.charAt(0).toUpperCase() + property.type.slice(1)}
         </Badge>
+        {/* Like Button positioned in top-right corner */}
+        <div className="absolute top-2 right-2">
+          <LikeButton property={property} size="sm" />
+        </div>
       </div>
       <CardContent className="p-4">
         <div className="mb-2">
@@ -45,7 +50,7 @@ export default function PropertyCard({ property, onClick }: PropertyCardProps) {
             {property.city}, {property.state} {property.zipCode}
           </div>
         </div>
-        
+
         <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
           <div className="flex items-center gap-1">
             <Bed size={16} />

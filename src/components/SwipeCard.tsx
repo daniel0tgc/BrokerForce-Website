@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Property } from '@/data/properties';
 import { Bed, Bath, Square, Heart, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import LikeButton from '@/components/LikeButton';
 
 interface SwipeCardProps {
   property: Property;
@@ -27,13 +28,13 @@ export default function SwipeCard({ property, onSwipeLeft, onSwipeRight }: Swipe
   };
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => 
+    setCurrentImageIndex((prev) =>
       prev === property.images.length - 1 ? 0 : prev + 1
     );
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => 
+    setCurrentImageIndex((prev) =>
       prev === 0 ? property.images.length - 1 : prev - 1
     );
   };
@@ -46,7 +47,7 @@ export default function SwipeCard({ property, onSwipeLeft, onSwipeRight }: Swipe
           alt={property.address}
           className="w-full h-full object-cover rounded-t-lg"
         />
-        
+
         {/* Image navigation */}
         {property.images.length > 1 && (
           <>
@@ -66,7 +67,7 @@ export default function SwipeCard({ property, onSwipeLeft, onSwipeRight }: Swipe
             >
               <ChevronRight size={16} />
             </Button>
-            
+
             {/* Image dots indicator */}
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-1">
               {property.images.map((_, index) => (
@@ -84,8 +85,12 @@ export default function SwipeCard({ property, onSwipeLeft, onSwipeRight }: Swipe
         <Badge className="absolute top-2 left-2 bg-white text-black hover:bg-white">
           {property.type.charAt(0).toUpperCase() + property.type.slice(1)}
         </Badge>
+        {/* Like Button positioned in top-right corner */}
+        <div className="absolute top-2 right-2">
+          <LikeButton property={property} size="sm" />
+        </div>
       </div>
-      
+
       <CardContent className="p-4 flex-shrink-0">
         <div className="mb-3">
           <div className="text-2xl font-bold text-green-600 mb-1">
@@ -98,7 +103,7 @@ export default function SwipeCard({ property, onSwipeLeft, onSwipeRight }: Swipe
             {property.city}, {property.state} {property.zipCode}
           </div>
         </div>
-        
+
         <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
           <div className="flex items-center gap-1">
             <Bed size={16} />
@@ -132,7 +137,18 @@ export default function SwipeCard({ property, onSwipeLeft, onSwipeRight }: Swipe
           <Button
             size="lg"
             className="flex-1 bg-green-600 hover:bg-green-700"
-            onClick={onSwipeRight}
+            onClick={() => {
+              // Add to favorites and then swipe right
+              const likedHouses = JSON.parse(localStorage.getItem('likedHouses') || '[]');
+              const isAlreadyLiked = likedHouses.some((house: Property) => house.id === property.id);
+              if (!isAlreadyLiked) {
+                const updatedLikedHouses = [...likedHouses, property];
+                localStorage.setItem('likedHouses', JSON.stringify(updatedLikedHouses));
+                // Dispatch custom event to update cart count
+                window.dispatchEvent(new CustomEvent('likedHousesChanged'));
+              }
+              onSwipeRight();
+            }}
           >
             <Heart size={20} className="mr-2" />
             Like

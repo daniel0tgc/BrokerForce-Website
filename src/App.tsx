@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import Index from '@/pages/Index';
 import SearchResults from '@/pages/SearchResults';
+import Favorites from '@/pages/Favorites';
 import NotFound from '@/pages/NotFound';
 import './App.css';
 
@@ -31,6 +32,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/search" element={<SearchResults />} />
+            <Route path="/favorites" element={<Favorites />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Toaster />
