@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import SearchBar from '@/components/SearchBar';
 import LikeButton from '@/components/LikeButton';
 import CartButton from '@/components/CartButton';
+import SignInButton from '@/components/SignInButton';
 import { Home, ArrowRight } from 'lucide-react';
 import { Property } from '@/data/properties';
 import { PropertyService } from '@/services/propertyService';
@@ -119,9 +120,7 @@ export default function LandingPage() {
             </Link>
             <div className="flex items-center space-x-4">
               <CartButton />
-              <Button variant="ghost" className="text-gray-700 hover:text-blue-600">
-                Sign in
-              </Button>
+              <SignInButton />
               <Button className="bg-blue-600 hover:bg-blue-700">
                 Get Started
               </Button>

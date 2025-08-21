@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import SignInButton from '@/components/SignInButton';
 import { Home, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -14,9 +15,7 @@ export default function Terms() {
               <span className="text-2xl font-bold text-gray-900">brokerforce.ai</span>
             </Link>
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" className="text-gray-700 hover:text-blue-600">
-                Sign in
-              </Button>
+              <SignInButton />
               <Button className="bg-blue-600 hover:bg-blue-700">
                 Get Started
               </Button>
