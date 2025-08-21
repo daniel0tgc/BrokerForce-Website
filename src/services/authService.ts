@@ -20,7 +20,8 @@ export interface SessionResponse {
 }
 
 class AuthService {
-  private baseUrl = 'http://localhost:3001';
+  // Use environment variable for production, fallback to localhost for development
+  private baseUrl = import.meta.env.VITE_AUTH_SERVER_URL || 'http://localhost:3001';
 
   // Check if user is authenticated
   async checkAuth(): Promise<AuthResponse> {
@@ -103,6 +104,11 @@ class AuthService {
       console.error('Auth server health check failed:', error);
       return false;
     }
+  }
+
+  // Get the current base URL (useful for debugging)
+  getBaseUrl(): string {
+    return this.baseUrl;
   }
 }
 
