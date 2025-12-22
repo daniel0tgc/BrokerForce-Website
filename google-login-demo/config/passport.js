@@ -8,9 +8,15 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: `${
-        process.env.BASE_URL || "http://localhost:3001"
-      }/auth/google/callback`,
+      callbackURL: (() => {
+        const baseUrl = process.env.BASE_URL || "http://localhost:3001";
+        // Ensure protocol is included
+        const url =
+          baseUrl.startsWith("http://") || baseUrl.startsWith("https://")
+            ? baseUrl
+            : `https://${baseUrl}`;
+        return `${url}/auth/google/callback`;
+      })(),
     },
     async (accessToken, refreshToken, profile, done) => {
       try {

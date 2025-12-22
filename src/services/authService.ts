@@ -21,27 +21,41 @@ export interface SessionResponse {
 
 class AuthService {
   // Use environment variable for production, fallback to localhost for development
-  private baseUrl = import.meta.env.VITE_AUTH_SERVER_URL || 'http://localhost:3001';
+  private baseUrl =
+    import.meta.env.VITE_AUTH_SERVER_URL || "http://localhost:3001";
 
   // Check if user is authenticated
   async checkAuth(): Promise<AuthResponse> {
     try {
       const response = await fetch(`${this.baseUrl}/api/me`, {
-        credentials: 'include',
+        credentials: "include",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
+      // Check if response is actually JSON (not HTML error page)
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        console.error("Auth check failed: Received non-JSON response", {
+          status: response.status,
+          statusText: response.statusText,
+          url: `${this.baseUrl}/api/me`,
+          contentType,
+        });
+        return { user: null, message: "Invalid response from server" };
+      }
+
       if (!response.ok) {
-        return { user: null, message: 'Not authenticated' };
+        return { user: null, message: "Not authenticated" };
       }
 
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('Auth check failed:', error);
-      return { user: null, message: 'Authentication check failed' };
+      console.error("Auth check failed:", error);
+      console.error("Backend URL:", this.baseUrl);
+      return { user: null, message: "Authentication check failed" };
     }
   }
 
@@ -49,9 +63,9 @@ class AuthService {
   async getSessionStatus(): Promise<SessionResponse> {
     try {
       const response = await fetch(`${this.baseUrl}/api/session`, {
-        credentials: 'include',
+        credentials: "include",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
@@ -62,7 +76,7 @@ class AuthService {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('Session check failed:', error);
+      console.error("Session check failed:", error);
       return { authenticated: false, user: null };
     }
   }
@@ -76,22 +90,22 @@ class AuthService {
   async logout(): Promise<{ success: boolean; message: string }> {
     try {
       const response = await fetch(`${this.baseUrl}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
+        method: "POST",
+        credentials: "include",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
       if (!response.ok) {
-        throw new Error('Logout failed');
+        throw new Error("Logout failed");
       }
 
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('Logout failed:', error);
-      return { success: false, message: 'Logout failed' };
+      console.error("Logout failed:", error);
+      return { success: false, message: "Logout failed" };
     }
   }
 
@@ -101,7 +115,7 @@ class AuthService {
       const response = await fetch(`${this.baseUrl}/health`);
       return response.ok;
     } catch (error) {
-      console.error('Auth server health check failed:', error);
+      console.error("Auth server health check failed:", error);
       return false;
     }
   }

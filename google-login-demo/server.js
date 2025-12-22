@@ -159,11 +159,22 @@ app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-app.listen(PORT, () => {
+// Start server and initialize database
+app.listen(PORT, async () => {
   console.log(`🚀 BrokerForce Auth Server running on port ${PORT}`);
   console.log(
     `📱 Frontend URL: ${process.env.FRONTEND_URL || "http://localhost:5173"}`
   );
   console.log(`🌐 Environment: ${process.env.NODE_ENV || "development"}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+  const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
+  console.log(`🔗 Base URL: ${baseUrl}`);
+  console.log(`🔗 Health check: ${baseUrl}/health`);
+  console.log(`🔗 API endpoint: ${baseUrl}/api/me`);
+
+  try {
+    await initializeSchema(); // Initialize database schema on startup
+  } catch (error) {
+    console.error("❌ Failed to initialize database schema on startup:", error);
+    // Do not exit, allow server to start even if schema init fails (e.g., already exists)
+  }
 });
