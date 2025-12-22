@@ -9,9 +9,9 @@
   SECRETS_SCAN_OMIT_KEYS = "NODE_ENV,PORT,BASE_URL,FRONTEND_URL"
 
 # Environment variables for production
-# You'll need to set these in your Netlify dashboard
-# [context.production.environment]
-#   VITE_AUTH_SERVER_URL = "https://your-auth-server-domain.com"
+# Temporarily hardcoded to fix build issue - verify correct URL in Railway
+[context.production.environment]
+  VITE_AUTH_SERVER_URL = "https://brokerforce-website-production.up.railway.app"
 
 # Redirects for SPA
 [[redirects]]
