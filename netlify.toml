@@ -4,6 +4,9 @@
 
 [build.environment]
   NODE_VERSION = "18"
+  # Configure secrets scanning to ignore false positives
+  # These are environment variable NAMES, not actual secrets
+  SECRETS_SCAN_OMIT_KEYS = "NODE_ENV,PORT,BASE_URL"
 
 # Environment variables for production
 # You'll need to set these in your Netlify dashboard
