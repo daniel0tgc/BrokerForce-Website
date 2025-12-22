@@ -187,29 +187,32 @@ export default function RepresentationForm() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <Button
-                variant="ghost"
-                onClick={() => navigate(`/property/${property.id}`)}
-                className="mr-2"
-              >
-                <ArrowLeft size={20} className="mr-2" />
-                Back to Property
-              </Button>
+      {/* Header with Logo */}
+      <div className="sticky top-0 z-50 bg-white">
+        <Header variant="minimal" className="border-b" />
+        <header className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
               <div className="flex items-center">
-                <FileText className="h-6 w-6 text-blue-600 mr-2" />
-                <span className="text-xl font-bold text-gray-900">
-                  Representation Agreement
-                </span>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate(`/property/${property.id}`)}
+                  className="mr-2"
+                >
+                  <ArrowLeft size={20} className="mr-2" />
+                  Back to Property
+                </Button>
+                <div className="flex items-center">
+                  <FileText className="h-6 w-6 text-blue-600 mr-2" />
+                  <span className="text-xl font-bold text-gray-900">
+                    Representation Agreement
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
+      </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Property Summary */}

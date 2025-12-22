@@ -6,6 +6,7 @@ import { Home, Trash2, ArrowLeft, Heart, Loader2 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { favoritesService } from "@/services/favoritesService";
 import { useAuth } from "@/hooks/useAuth";
+import Header from "@/components/Header";
 
 export default function Favorites() {
   const [likedHouses, setLikedHouses] = useState<Property[]>([]);
@@ -140,40 +141,43 @@ export default function Favorites() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <Button
-                variant="ghost"
-                onClick={() => navigate("/")}
-                className="mr-2"
-              >
-                <ArrowLeft size={20} className="mr-2" />
-                Back to Home
-              </Button>
+      {/* Header with Logo */}
+      <div className="sticky top-0 z-50 bg-white">
+        <Header variant="minimal" className="border-b" />
+        <header className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
               <div className="flex items-center">
-                <Heart className="h-6 w-6 text-red-500 mr-2" />
-                <span className="text-xl font-bold text-gray-900">
-                  My Favorites
-                </span>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate("/")}
+                  className="mr-2"
+                >
+                  <ArrowLeft size={20} className="mr-2" />
+                  Back to Home
+                </Button>
+                <div className="flex items-center">
+                  <Heart className="h-6 w-6 text-red-500 mr-2" />
+                  <span className="text-xl font-bold text-gray-900">
+                    My Favorites
+                  </span>
+                </div>
               </div>
-            </div>
 
-            {likedHouses.length > 0 && (
-              <Button
-                variant="outline"
-                onClick={clearAll}
-                className="text-red-600 border-red-300 hover:bg-red-50"
-              >
-                <Trash2 size={16} className="mr-2" />
-                Clear All
-              </Button>
-            )}
+              {likedHouses.length > 0 && (
+                <Button
+                  variant="outline"
+                  onClick={clearAll}
+                  className="text-red-600 border-red-300 hover:bg-red-50"
+                >
+                  <Trash2 size={16} className="mr-2" />
+                  Clear All
+                </Button>
+              )}
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Page Header */}

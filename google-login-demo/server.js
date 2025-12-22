@@ -10,9 +10,20 @@ require("dotenv").config();
 require("./config/passport");
 
 // Initialize database connection
-const { query } = require("./db");
+const { query, initializeSchema } = require("./db");
 
 const app = express();
+
+// Initialize database schema on startup (idempotent - safe to run multiple times)
+initializeSchema().catch((err) => {
+  console.error(
+    "⚠️  Warning: Could not initialize database schema:",
+    err.message
+  );
+  console.log(
+    "💡 You may need to initialize the schema manually: node db/init.js"
+  );
+});
 const PORT = process.env.PORT || 3001;
 
 // Middleware

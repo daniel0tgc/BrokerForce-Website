@@ -187,7 +187,7 @@ A modern real estate website built with React, TypeScript, and Tailwind CSS. The
    - 🔐 **Backend**: `http://localhost:3001` (Auth server)
 
 For detailed setup instructions, see [SETUP.md](./SETUP.md).
-For production deployment, see [PRE_DEPLOYMENT_CHECKLIST.md](./PRE_DEPLOYMENT_CHECKLIST.md).
+For production deployment, see [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md).
 
 ---
 

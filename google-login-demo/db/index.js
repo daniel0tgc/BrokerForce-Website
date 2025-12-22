@@ -73,8 +73,41 @@ const getClient = async () => {
   return client;
 };
 
+// Initialize database schema (idempotent - safe to run multiple times)
+const initializeSchema = async () => {
+  try {
+    const fs = require("fs");
+    const path = require("path");
+
+    // Read schema file
+    const schemaPath = path.join(__dirname, "schema.sql");
+    const schema = fs.readFileSync(schemaPath, "utf8");
+
+    // Execute schema (CREATE TABLE IF NOT EXISTS makes this idempotent)
+    await pool.query(schema);
+
+    console.log("✅ Database schema initialized successfully!");
+    return true;
+  } catch (error) {
+    // Check if error is about tables already existing (which is fine)
+    const errorMsg = error.message || error.toString();
+    if (errorMsg.includes("already exists") || errorMsg.includes("duplicate")) {
+      console.log(
+        "ℹ️  Database tables already exist (schema already initialized)"
+      );
+      return true;
+    }
+    // For other errors, log but don't crash the server
+    // This allows the server to start even if schema initialization fails
+    // Admin can manually initialize schema if needed
+    console.warn("⚠️  Database schema initialization warning:", errorMsg);
+    return false;
+  }
+};
+
 module.exports = {
   pool,
   query,
   getClient,
+  initializeSchema,
 };

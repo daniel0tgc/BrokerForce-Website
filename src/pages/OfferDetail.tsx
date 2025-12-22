@@ -23,6 +23,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import Header from "@/components/Header";
 
 export default function OfferDetail() {
   const { id } = useParams<{ id: string }>();
@@ -171,25 +172,28 @@ export default function OfferDetail() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Button
-              variant="ghost"
-              onClick={() => navigate("/dashboard/offers")}
-              className="flex items-center"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Offers
-            </Button>
-            <h1 className="text-lg font-semibold text-gray-900">
-              Offer Details
-            </h1>
-            <div className="w-20" /> {/* Spacer for centering */}
+      {/* Header with Logo */}
+      <div className="sticky top-0 z-50 bg-white">
+        <Header variant="minimal" className="border-b" />
+        <header className="bg-white shadow-sm border-b">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/dashboard/offers")}
+                className="flex items-center"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Offers
+              </Button>
+              <h1 className="text-lg font-semibold text-gray-900">
+                Offer Details
+              </h1>
+              <div className="w-20" /> {/* Spacer for centering */}
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      </div>
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Status Card */}

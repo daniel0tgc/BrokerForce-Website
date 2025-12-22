@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import LikeButton from "@/components/LikeButton";
+import Header from "@/components/Header";
 
 export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>();
@@ -257,42 +258,45 @@ export default function PropertyDetail() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <Button
-                variant="ghost"
-                onClick={() => navigate(-1)}
-                className="mr-2"
-              >
-                <ArrowLeft size={20} className="mr-2" />
-                Back
-              </Button>
+      {/* Header with Logo */}
+      <div className="sticky top-0 z-50 bg-white">
+        <Header variant="minimal" className="border-b" />
+        <header className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
               <div className="flex items-center">
-                <Home className="h-6 w-6 text-blue-600 mr-2" />
-                <span className="text-xl font-bold text-gray-900">
-                  Property Details
-                </span>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate(-1)}
+                  className="mr-2"
+                >
+                  <ArrowLeft size={20} className="mr-2" />
+                  Back
+                </Button>
+                <div className="flex items-center">
+                  <Home className="h-6 w-6 text-blue-600 mr-2" />
+                  <span className="text-xl font-bold text-gray-900">
+                    Property Details
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleShare}
+                  className="border-gray-300 hover:bg-gray-50"
+                >
+                  <Share2 size={16} className="mr-2" />
+                  Share
+                </Button>
+                <LikeButton property={property} size="md" />
               </div>
             </div>
-
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleShare}
-                className="border-gray-300 hover:bg-gray-50"
-              >
-                <Share2 size={16} className="mr-2" />
-                Share
-              </Button>
-              <LikeButton property={property} size="md" />
-            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Property Header */}
