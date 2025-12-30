@@ -106,12 +106,14 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
+      // In production, secure must be true when using sameSite: "none"
+      secure: process.env.NODE_ENV === "production" ? true : false,
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
       // In production, use "none" with secure: true for cross-origin
       // In development, use "lax" for localhost (browsers allow this for localhost)
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      // Don't set domain - let browser handle it for cross-origin cookies
     },
   })
 );

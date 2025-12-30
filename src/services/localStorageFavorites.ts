@@ -87,4 +87,3 @@ class LocalStorageFavoritesService {
 }
 
 export const localStorageFavoritesService = new LocalStorageFavoritesService();
-

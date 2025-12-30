@@ -19,11 +19,20 @@ router.get(
     }?auth=error`,
   }),
   (req, res) => {
-    // Successful authentication, redirect to frontend
-    const redirectUrl = `${
-      process.env.FRONTEND_URL || "http://localhost:5173"
-    }?auth=success`;
-    res.redirect(redirectUrl);
+    // Successful authentication, save session before redirect
+    req.session.save((err) => {
+      if (err) {
+        console.error("Session save error:", err);
+        return res.redirect(
+          `${process.env.FRONTEND_URL || "http://localhost:5173"}?auth=error`
+        );
+      }
+      // Redirect to frontend after session is saved
+      const redirectUrl = `${
+        process.env.FRONTEND_URL || "http://localhost:5173"
+      }?auth=success`;
+      res.redirect(redirectUrl);
+    });
   }
 );
 

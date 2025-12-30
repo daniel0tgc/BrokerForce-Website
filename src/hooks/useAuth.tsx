@@ -87,11 +87,59 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       newUrl.searchParams.delete("auth");
       window.history.replaceState({}, "", newUrl.toString());
 
-      // Add a small delay to ensure cookies are processed after redirect
-      // This helps with cross-origin cookie handling
+      // Retry logic to check authentication after OAuth redirect
+      // This helps with cross-origin cookie handling where cookies may take time to be set
+      let retryCount = 0;
+      const maxRetries = 5;
+      
+      const attemptAuthCheck = async () => {
+        try {
+          const response: AuthResponse = await authService.checkAuth();
+          if (response.user) {
+            // Success! User is authenticated
+            setUser(response.user);
+            setIsLoading(false);
+            // Migrate localStorage favorites to database
+            try {
+              await favoritesService.migrateLocalStorageToDatabase();
+            } catch (err) {
+              console.error("Error migrating favorites:", err);
+            }
+            return; // Stop retrying
+          }
+          
+          // No user yet, retry if we haven't exceeded max retries
+          retryCount++;
+          if (retryCount < maxRetries) {
+            // Exponential backoff: 300ms, 600ms, 1200ms, 2400ms
+            const delay = 300 * Math.pow(2, retryCount - 1);
+            setTimeout(() => {
+              attemptAuthCheck();
+            }, delay);
+          } else {
+            // Max retries reached, give up
+            setIsLoading(false);
+            setUser(null);
+          }
+        } catch (error) {
+          console.error(`Auth check attempt ${retryCount + 1} failed:`, error);
+          retryCount++;
+          if (retryCount < maxRetries) {
+            const delay = 300 * Math.pow(2, retryCount - 1);
+            setTimeout(() => {
+              attemptAuthCheck();
+            }, delay);
+          } else {
+            setIsLoading(false);
+            setUser(null);
+          }
+        }
+      };
+
+      // Start with a small initial delay, then retry
       setTimeout(() => {
-        checkAuth();
-      }, 100);
+        attemptAuthCheck();
+      }, 300);
     } else {
       // Normal auth check on mount
       checkAuth();

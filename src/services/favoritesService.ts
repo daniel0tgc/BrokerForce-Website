@@ -62,7 +62,7 @@ class FavoritesService {
 
     // Check authentication if not explicitly provided
     const authenticated = isAuthenticated ?? (await this.checkAuthentication());
-    
+
     if (!authenticated) {
       // Use localStorage for non-authenticated users
       const localFavorites = localStorageFavoritesService.getAll();
@@ -103,7 +103,7 @@ class FavoritesService {
 
     // Check authentication if not explicitly provided
     const authenticated = isAuthenticated ?? (await this.checkAuthentication());
-    
+
     if (!authenticated) {
       // Use localStorage for non-authenticated users
       if (propertyData) {
@@ -141,7 +141,7 @@ class FavoritesService {
 
     // Check authentication if not explicitly provided
     const authenticated = isAuthenticated ?? (await this.checkAuthentication());
-    
+
     if (!authenticated) {
       // Use localStorage for non-authenticated users
       localStorageFavoritesService.remove(propertyId);
@@ -165,7 +165,7 @@ class FavoritesService {
 
     // Check authentication if not explicitly provided
     const authenticated = isAuthenticated ?? (await this.checkAuthentication());
-    
+
     if (!authenticated) {
       // Use localStorage for non-authenticated users
       return localStorageFavoritesService.isFavorite(propertyId);
@@ -197,7 +197,7 @@ class FavoritesService {
           console.log(`Favorite ${fav.propertyId} might already exist, skipping`);
         }
       }
-      
+
       // Clear localStorage after successful migration
       localStorageFavoritesService.clear();
     } catch (error) {
