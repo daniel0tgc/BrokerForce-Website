@@ -7,7 +7,7 @@ router.get("/me", async (req, res) => {
   console.log("/api/me called - Session ID:", req.sessionID);
   console.log("/api/me called - req.user:", req.user ? "exists" : "null");
   console.log("/api/me called - Cookies:", req.headers.cookie ? "present" : "missing");
-  
+
   if (req.user) {
     try {
       // Get user from database to ensure we have latest data

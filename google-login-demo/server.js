@@ -26,6 +26,10 @@ initializeSchema().catch((err) => {
 });
 const PORT = process.env.PORT || 3001;
 
+// Trust proxy - Required for Railway/production environments
+// This allows Express to correctly detect HTTPS and set secure cookies
+app.set('trust proxy', 1);
+
 // Middleware
 // CORS configuration - allow requests from frontend
 const corsOptions = {
@@ -101,7 +105,7 @@ app.use(cookieParser());
 // Session configuration
 // Determine if we're in production (for cookie settings)
 // Check NODE_ENV first, then fall back to checking if URLs are HTTPS
-const isProduction = 
+const isProduction =
   process.env.NODE_ENV === "production" ||
   (process.env.BASE_URL && process.env.BASE_URL.startsWith("https://")) ||
   (process.env.FRONTEND_URL && process.env.FRONTEND_URL.startsWith("https://"));

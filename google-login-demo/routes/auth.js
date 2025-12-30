@@ -22,7 +22,7 @@ router.get(
     // Successful authentication
     console.log("OAuth callback successful, user:", req.user?.email);
     console.log("Session ID:", req.sessionID);
-    
+
     // Save session before redirect
     req.session.save((err) => {
       if (err) {
