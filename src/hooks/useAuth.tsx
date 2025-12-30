@@ -31,9 +31,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(true);
       setError(null);
 
+      console.log("Checking authentication...");
       const response: AuthResponse = await authService.checkAuth();
+      console.log("Auth check response:", response);
 
       if (response.user) {
+        console.log("User authenticated:", response.user.email);
         setUser(response.user);
         // Migrate localStorage favorites to database when user signs in
         try {
@@ -43,6 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Don't fail auth if migration fails
         }
       } else {
+        console.log("No user found in auth response");
         setUser(null);
       }
     } catch (err) {
@@ -82,6 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const authStatus = urlParams.get("auth");
 
     if (authStatus === "success") {
+      console.log("OAuth redirect detected, checking authentication...");
       // Remove the auth parameter from URL
       const newUrl = new URL(window.location.href);
       newUrl.searchParams.delete("auth");
@@ -90,56 +95,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Retry logic to check authentication after OAuth redirect
       // This helps with cross-origin cookie handling where cookies may take time to be set
       let retryCount = 0;
-      const maxRetries = 5;
-      
+      const maxRetries = 10; // Increased retries
+      const baseDelay = 300; // Initial delay
+
       const attemptAuthCheck = async () => {
+        retryCount++;
+        console.log(`Auth check attempt ${retryCount}/${maxRetries}`);
+        
         try {
+          // Call authService directly to get the response
           const response: AuthResponse = await authService.checkAuth();
+          
           if (response.user) {
-            // Success! User is authenticated
-            setUser(response.user);
-            setIsLoading(false);
-            // Migrate localStorage favorites to database
-            try {
-              await favoritesService.migrateLocalStorageToDatabase();
-            } catch (err) {
-              console.error("Error migrating favorites:", err);
-            }
+            // Success! User is authenticated - use checkAuth to update state properly
+            console.log("User found, updating state...");
+            await checkAuth(); // This will handle state updates and favorites migration
             return; // Stop retrying
           }
           
           // No user yet, retry if we haven't exceeded max retries
-          retryCount++;
+          console.log(`No user found, will retry... (attempt ${retryCount}/${maxRetries})`);
           if (retryCount < maxRetries) {
-            // Exponential backoff: 300ms, 600ms, 1200ms, 2400ms
-            const delay = 300 * Math.pow(2, retryCount - 1);
+            // Exponential backoff with jitter
+            const delay = baseDelay * Math.pow(1.5, retryCount - 1);
+            console.log(`Retrying auth check in ${delay}ms...`);
             setTimeout(() => {
               attemptAuthCheck();
             }, delay);
           } else {
-            // Max retries reached, give up
+            // Max retries reached
+            console.error("Max auth check retries reached, giving up");
             setIsLoading(false);
             setUser(null);
           }
         } catch (error) {
-          console.error(`Auth check attempt ${retryCount + 1} failed:`, error);
-          retryCount++;
+          console.error(`Auth check attempt ${retryCount} failed:`, error);
           if (retryCount < maxRetries) {
-            const delay = 300 * Math.pow(2, retryCount - 1);
+            const delay = baseDelay * Math.pow(1.5, retryCount - 1);
             setTimeout(() => {
               attemptAuthCheck();
             }, delay);
           } else {
+            console.error("Max auth check retries reached after error");
             setIsLoading(false);
             setUser(null);
           }
         }
       };
 
-      // Start with a small initial delay, then retry
+      // Start with initial delay, then retry
       setTimeout(() => {
         attemptAuthCheck();
-      }, 300);
+      }, baseDelay);
     } else {
       // Normal auth check on mount
       checkAuth();
