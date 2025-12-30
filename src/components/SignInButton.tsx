@@ -1,5 +1,6 @@
 // src/components/SignInButton.tsx
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -11,11 +12,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
-import { LogOut, User, Loader2 } from "lucide-react";
+import { LogOut, User, Heart, Loader2 } from "lucide-react";
 
 export default function SignInButton() {
   const { user, isLoading, isAuthenticated, login, logout } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -69,7 +71,13 @@ export default function SignInButton() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            onClick={() => (window.location.href = "/dashboard")}
+            onClick={() => navigate("/favorites")}
+          >
+            <Heart className="mr-2 h-4 w-4" />
+            <span>Liked Houses</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => navigate("/dashboard")}
           >
             <User className="mr-2 h-4 w-4" />
             <span>Dashboard</span>
