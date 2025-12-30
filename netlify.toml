@@ -11,7 +11,7 @@
 # Environment variables for production
 # Temporarily hardcoded to fix build issue - verify correct URL in Railway
 [context.production.environment]
-  VITE_AUTH_SERVER_URL = "https://brokerforce-website-production.up.railway.app"
+  VITE_AUTH_SERVER_URL = "https://brokerforce-website-production-a631.up.railway.app"
 
 # Redirects for SPA
 [[redirects]]
