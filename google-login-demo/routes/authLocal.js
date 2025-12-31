@@ -171,13 +171,13 @@ router.post("/register", async (req, res) => {
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Create user
+    // Create new user
     const userId = uuidv4();
     const result = await query(
       `INSERT INTO users (id, username, password_hash, name, email, created_at, updated_at)
        VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
        RETURNING id, username, name, email, avatar, created_at`,
-      [userId, username.toLowerCase(), passwordHash, name.trim(), email ? email.toLowerCase() : null]
+      [userId, normalizedUsername, passwordHash, name.trim(), normalizedEmail]
     );
 
     const user = result.rows[0];
