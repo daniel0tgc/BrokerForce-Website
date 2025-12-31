@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
+import Header from "@/components/Header";
 import { Property } from "@/data/properties";
 import { PropertyService } from "@/services/propertyService";
 import { useAuth } from "@/hooks/useAuth";
