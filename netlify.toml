@@ -1,6 +1,7 @@
 [build]
   publish = "dist"
   command = "npm install -g pnpm@8.10.0 --force && pnpm install && pnpm build"
+  # Rebuild triggered to fix Header import issue
 
 [build.environment]
   NODE_VERSION = "18"
