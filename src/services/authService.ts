@@ -2,11 +2,24 @@
 
 export interface User {
   id: string;
+  username?: string;
   name: string;
   email: string;
   avatar?: string;
   googleId?: string;
   createdAt?: string;
+}
+
+export interface RegisterData {
+  username: string;
+  password: string;
+  name: string;
+  email?: string;
+}
+
+export interface LoginData {
+  username: string;
+  password: string;
 }
 
 export interface AuthResponse {
@@ -122,6 +135,78 @@ class AuthService {
     } catch (error) {
       console.error("Auth server health check failed:", error);
       return false;
+    }
+  }
+
+  // Check if username is available
+  async checkUsername(username: string): Promise<{ available: boolean; error?: string }> {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/auth/check-username/${encodeURIComponent(username)}`, {
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        return { available: false, error: "Failed to check username" };
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Check username failed:", error);
+      return { available: false, error: "Failed to check username" };
+    }
+  }
+
+  // Register new user with username/password
+  async register(data: RegisterData): Promise<{ success: boolean; user?: User; error?: string }> {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/auth/register`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: result.error || "Registration failed" };
+      }
+
+      return { success: true, user: result.user };
+    } catch (error) {
+      console.error("Registration failed:", error);
+      return { success: false, error: "Registration failed" };
+    }
+  }
+
+  // Login with username/password
+  async loginWithPassword(data: LoginData): Promise<{ success: boolean; user?: User; error?: string }> {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/auth/login`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: result.error || "Login failed" };
+      }
+
+      return { success: true, user: result.user };
+    } catch (error) {
+      console.error("Login failed:", error);
+      return { success: false, error: "Login failed" };
     }
   }
 

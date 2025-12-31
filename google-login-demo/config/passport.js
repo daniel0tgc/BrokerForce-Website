@@ -20,32 +20,24 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // Check if user already exists
-        const existingUser = await query(
+        const googleEmail = profile.emails[0].value.toLowerCase();
+        
+        // Check if user already exists with this Google ID
+        const existingGoogleUser = await query(
           "SELECT * FROM users WHERE google_id = $1",
           [profile.id]
         );
 
+        // Check if user exists with this email (for account linking)
+        const existingEmailUser = await query(
+          "SELECT * FROM users WHERE email = $1 AND google_id IS NULL",
+          [googleEmail]
+        );
+
         let user;
 
-        if (existingUser.rows.length === 0) {
-          // Create new user
-          const result = await query(
-            `INSERT INTO users (id, google_id, name, email, avatar, created_at, updated_at)
-             VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-             RETURNING *`,
-            [
-              profile.id,
-              profile.id,
-              profile.displayName,
-              profile.emails[0].value,
-              profile.photos[0]?.value || null,
-            ]
-          );
-          user = result.rows[0];
-          console.log(`New user created: ${user.name} (${user.email})`);
-        } else {
-          // Update existing user info
+        if (existingGoogleUser.rows.length > 0) {
+          // User already has Google account - update info
           const result = await query(
             `UPDATE users
              SET name = $1, email = $2, avatar = $3, updated_at = CURRENT_TIMESTAMP
@@ -53,19 +45,56 @@ passport.use(
              RETURNING *`,
             [
               profile.displayName,
-              profile.emails[0].value,
+              googleEmail,
               profile.photos[0]?.value || null,
               profile.id,
             ]
           );
           user = result.rows[0];
-          console.log(`User updated: ${user.name} (${user.email})`);
+          console.log(`Google user updated: ${user.name} (${user.email})`);
+        } else if (existingEmailUser.rows.length > 0) {
+          // Account linking: User has username/password account with same email
+          // Link Google account to existing account
+          const existingUser = existingEmailUser.rows[0];
+          const result = await query(
+            `UPDATE users
+             SET google_id = $1, name = $2, avatar = $3, updated_at = CURRENT_TIMESTAMP
+             WHERE id = $4
+             RETURNING *`,
+            [
+              profile.id,
+              profile.displayName,
+              profile.photos[0]?.value || existingUser.avatar,
+              existingUser.id,
+            ]
+          );
+          user = result.rows[0];
+          console.log(`Google account linked to existing user: ${user.name} (${user.email})`);
+        } else {
+          // Create new user with Google account
+          const { v4: uuidv4 } = require("uuid");
+          const userId = uuidv4();
+          const result = await query(
+            `INSERT INTO users (id, google_id, name, email, avatar, created_at, updated_at)
+             VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+             RETURNING *`,
+            [
+              userId,
+              profile.id,
+              profile.displayName,
+              googleEmail,
+              profile.photos[0]?.value || null,
+            ]
+          );
+          user = result.rows[0];
+          console.log(`New Google user created: ${user.name} (${user.email})`);
         }
 
         // Transform database user to expected format
         const userObj = {
           id: user.id,
           googleId: user.google_id,
+          username: user.username,
           name: user.name,
           email: user.email,
           avatar: user.avatar,
@@ -98,6 +127,7 @@ passport.deserializeUser(async (id, done) => {
     const userObj = {
       id: user.id,
       googleId: user.google_id,
+      username: user.username,
       name: user.name,
       email: user.email,
       avatar: user.avatar,

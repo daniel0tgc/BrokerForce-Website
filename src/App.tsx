@@ -22,6 +22,7 @@ import Contact from "@/pages/Contact";
 import Help from "@/pages/Help";
 import Terms from "@/pages/Terms";
 import Privacy from "@/pages/Privacy";
+import SignIn from "@/pages/SignIn";
 import NotFound from "@/pages/NotFound";
 import "./App.css";
 
@@ -90,6 +91,7 @@ function App() {
               <Route path="/help" element={<Help />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
+              <Route path="/signin" element={<SignIn />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Toaster />

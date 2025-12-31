@@ -4,12 +4,25 @@
 CREATE TABLE IF NOT EXISTS users (
   id VARCHAR(255) PRIMARY KEY,
   google_id VARCHAR(255) UNIQUE,
+  username VARCHAR(50) UNIQUE,
+  password_hash VARCHAR(255),
   name VARCHAR(255) NOT NULL,
-  email VARCHAR(255) UNIQUE NOT NULL,
+  email VARCHAR(255) UNIQUE,
   avatar TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT check_username_format CHECK (
+    username IS NULL OR (
+      LENGTH(username) >= 3 AND 
+      LENGTH(username) <= 20 AND 
+      username ~ '^[a-zA-Z0-9_-]+$'
+    )
+  )
 );
+
+-- Create indexes for faster lookups
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 
 -- User favorites (saved homes)
 CREATE TABLE IF NOT EXISTS user_favorites (

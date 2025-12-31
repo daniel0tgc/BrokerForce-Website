@@ -19,6 +19,7 @@ router.get("/me", async (req, res) => {
         res.json({
           user: {
             id: user.id,
+            username: user.username,
             name: user.name,
             email: user.email,
             avatar: user.avatar,

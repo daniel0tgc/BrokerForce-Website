@@ -15,6 +15,8 @@ const { query, initializeSchema } = require("./db");
 const app = express();
 
 // Initialize database schema on startup (idempotent - safe to run multiple times)
+// Note: For existing databases, you may need to run the migration script:
+// node -e "require('./db/index').query(require('fs').readFileSync('./db/migrate_add_username_password.sql', 'utf8')).then(() => console.log('Migration complete')).catch(console.error)"
 initializeSchema().catch((err) => {
   console.error(
     "⚠️  Warning: Could not initialize database schema:",
@@ -22,6 +24,9 @@ initializeSchema().catch((err) => {
   );
   console.log(
     "💡 You may need to initialize the schema manually: node db/init.js"
+  );
+  console.log(
+    "💡 For existing databases, run the migration: Check migrate_add_username_password.sql"
   );
 });
 const PORT = process.env.PORT || 3001;
@@ -145,6 +150,7 @@ app.use(passport.session());
 
 // Routes
 app.use("/auth", require("./routes/auth"));
+app.use("/api/auth", require("./routes/authLocal"));
 app.use("/api", require("./routes/api"));
 app.use("/api/favorites", require("./routes/favorites"));
 app.use("/api/purchases", require("./routes/purchases"));

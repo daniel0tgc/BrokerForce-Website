@@ -93,7 +93,7 @@ export default function SignInButton() {
   return (
     <Button
       variant="ghost"
-      onClick={login}
+      onClick={() => navigate("/signin")}
       className="text-gray-700 hover:text-blue-600"
     >
       Sign in
