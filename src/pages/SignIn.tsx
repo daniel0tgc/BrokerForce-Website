@@ -144,7 +144,7 @@ export default function SignIn() {
 
       if (result.success && result.user) {
         await checkAuth(); // Refresh auth state
-        
+
         // Show different message if accounts were linked
         if (result.linked) {
           toast({

@@ -173,20 +173,28 @@ class AuthService {
       });
 
       const result = await response.json();
+      
+      console.log("Registration response:", { ok: response.ok, status: response.status, result });
 
       if (!response.ok) {
+        console.error("Registration failed with status:", response.status, result);
         return { success: false, error: result.error || "Registration failed" };
       }
 
-      return { 
-        success: true, 
+      if (!result.user) {
+        console.error("Registration response missing user:", result);
+        return { success: false, error: "Registration succeeded but user data is missing" };
+      }
+
+      return {
+        success: true,
         user: result.user,
         linked: result.linked || false,
-        message: result.message 
+        message: result.message
       };
     } catch (error) {
       console.error("Registration failed:", error);
-      return { success: false, error: "Registration failed" };
+      return { success: false, error: error instanceof Error ? error.message : "Registration failed" };
     }
   }
 

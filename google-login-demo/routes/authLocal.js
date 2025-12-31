@@ -125,7 +125,7 @@ router.post("/register", async (req, res) => {
       if (existingUser.google_id && !existingUser.username) {
         // Link username/password to existing Google account
         const passwordHash = await bcrypt.hash(password, 10);
-        
+
         const result = await query(
           `UPDATE users
            SET username = $1, password_hash = $2, updated_at = CURRENT_TIMESTAMP
@@ -136,7 +136,7 @@ router.post("/register", async (req, res) => {
 
         const user = result.rows[0];
         console.log(`Linked username/password to existing Google account for user ${user.id} (email: ${user.email})`);
-        
+
         // Log in the user
         req.login(
           {
@@ -214,7 +214,31 @@ router.post("/register", async (req, res) => {
     );
   } catch (error) {
     console.error("Registration error:", error);
-    res.status(500).json({ error: "Registration failed" });
+    console.error("Error stack:", error.stack);
+    console.error("Error details:", {
+      message: error.message,
+      code: error.code,
+      detail: error.detail,
+      constraint: error.constraint,
+    });
+    
+    // Provide more specific error messages
+    let errorMessage = "Registration failed";
+    if (error.code === '23505') { // Unique constraint violation
+      if (error.constraint === 'users_username_key') {
+        errorMessage = "Username is already taken";
+      } else if (error.constraint === 'users_email_key') {
+        errorMessage = "Email is already registered";
+      } else {
+        errorMessage = "This username or email is already registered";
+      }
+    } else if (error.code === '23502') { // Not null constraint violation
+      errorMessage = "Missing required field";
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+    
+    res.status(500).json({ error: errorMessage });
   }
 });
 
