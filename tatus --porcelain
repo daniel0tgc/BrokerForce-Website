@@ -1,8 +1,0 @@
-src/App.css
-src/App.tsx
-src/components/PropertyCard.tsx
-src/components/SearchBar.tsx
-src/components/SwipeCard.tsx
-src/components/ui/slider.tsx
-src/pages/Index.tsx
-src/pages/SearchResults.tsx
